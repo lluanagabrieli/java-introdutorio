@@ -1,6 +1,8 @@
 package br.com.luanagabrieli.todolist.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,16 +15,19 @@ public class UserController {
     private IUserRepository userRepository;
 
     @PostMapping("/create")
-    public UserModel create(@RequestBody UserModel userModel) {
+    public ResponseEntity create(@RequestBody UserModel userModel) {
         var verificaUsername = userRepository.findByUsername(userModel.getUsername());
-        System.out.println(verificaUsername);
 
         if(verificaUsername != null) {
-            System.out.println("Username já existe");
-            return null;
+            // mensagem de erro
+            // retornar o status code
+
+            // ResponseEntity é uma classe que já trás as respostas HTTP prontas, como status code, headers e body
+            // dentro do status pode passar o código diretamente ou utilizar o HttpStatus. Se clicar nele é possível consultar os status disponíveis
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário já existe");
         }
 
         var userCreated = this.userRepository.save(userModel);
-        return userCreated;
+        return ResponseEntity.status(HttpStatus.OK).body(userCreated);
     }
 }
