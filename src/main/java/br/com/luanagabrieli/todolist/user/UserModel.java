@@ -11,24 +11,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-// Insere getters automaticamente para todos os atributos
-//@Getter
-
-// Insere getters e setters automaticamente para todos os atributos, não precisa mais escrever manualmente
 @Data
-@Entity(name="tb_users") // Nome da tabela no banco de dados. Foi inserido o "tb_" para diferenciar das tabelas do H2. Quando falamos em entidade estamos nos referindo a uma classe que representa uma tabela no banco de dados.
+@Entity(name="tb_users")
 public class UserModel {
-    // Quando eu não coloco o modificador, ele é considerado public, mas só é acessível dentro do mesmo pacote
-    //quanto é private, só é acessível dentro da própria classe
-    @Column(unique = true) // Garante que o valor do atributo seja único no banco de dados, não permitindo duplicidade
+    @Column(unique = true)
     private String username;
     private String name;
     private String password;
 
-    @GeneratedValue(generator = "UUID") // Gera um valor automaticamente para o id, no caso um UUID
-    @Id // Chave primária da tabela. A importação do Id é do jakarta.persistence.Id.
+    @GeneratedValue(generator = "UUID")
+    @Id
     private UUID id;
 
-    @CreationTimestamp // Insere a data e hora atual automaticamente quando o registro é criado
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }
