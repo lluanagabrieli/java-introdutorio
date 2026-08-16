@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -26,6 +28,10 @@ public class UserController {
             // dentro do status pode passar o código diretamente ou utilizar o HttpStatus. Se clicar nele é possível consultar os status disponíveis
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário já existe");
         }
+
+        // Hash da senha utilizando a biblioteca BCrypt
+        var passwordHashed = BCrypt.withDefaults().hashToString(12, userModel.getPassword().toCharArray());
+        userModel.setPassword(passwordHashed);
 
         var userCreated = this.userRepository.save(userModel);
         return ResponseEntity.status(HttpStatus.OK).body(userCreated);
