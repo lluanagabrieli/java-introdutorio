@@ -30,6 +30,7 @@ public class UserController {
         }
 
         // Hash da senha utilizando a biblioteca BCrypt
+        // Pega a senha, transorma em um array de char ['S', 'e', 'n', 'h', 'a'],gera o hash com 12 rounds de complexidade (o quanto deve trabalhar para calcular o hash) e retorna o hash em string. O hash é armazenado no banco de dados, não a senha original.
         var passwordHashed = BCrypt.withDefaults().hashToString(12, userModel.getPassword().toCharArray());
         userModel.setPassword(passwordHashed);
 
