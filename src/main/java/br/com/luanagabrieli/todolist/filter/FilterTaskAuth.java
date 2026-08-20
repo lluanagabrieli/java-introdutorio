@@ -3,9 +3,12 @@ package br.com.luanagabrieli.todolist.filter;
 import java.io.IOException;
 import java.util.Base64;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import br.com.luanagabrieli.todolist.user.IUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,31 +36,53 @@ import jakarta.servlet.http.HttpServletResponse;
 // OncePerRequestFilter: mais específico para o Spring, facilitando o controle
 public class FilterTaskAuth extends OncePerRequestFilter {
 
+    @Autowired
+    private IUserRepository userRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-            // Executar alguma ação
-            System.out.println("Chegou no filtro");
+            // Pegar a rota atual
+            var servletPath = request.getServletPath();
+            // Verificar se essa rota vai ter verificação de user
+            if(servletPath.equals("/tasks/")) {
+                // Pegar a autenticação (usuario e senha)
+                var authorization = request.getHeader("Authorization"); // Pega o header da requisição. Exemplo: Basic dXNlcjasdNzd29yZA==
 
-            // Pegar a autenticação (usuario e senha)
-            var authorization = request.getHeader("Authorization"); // Pega o header da requisição. Exemplo: Basic dXNlcjasdNzd29yZA==
+                var authEncoded = authorization.substring("Basic".length()).trim(); // Pega o usuario e senha do header, removendo a palavra "Basic" e os espaços em branco. Exemplo: dXNlcjasdNzd29yZA==
 
-            var authEncoded = authorization.substring("Basic".length()).trim(); // Pega o usuario e senha do header, removendo a palavra "Basic" e os espaços em branco. Exemplo: dXNlcjasdNzd29yZA==
+                byte[] authDecoded = Base64.getDecoder().decode(authEncoded); // Decodifica o usuario e senha do header. Exemplo: [B@1a2b3c4d5e6f7g8h9i0j]
 
-            byte[] authDecoded = Base64.getDecoder().decode(authEncoded); // Decodifica o usuario e senha do header. Exemplo: [B@1a2b3c4d5e6f7g8h9i0j]
+                var authString = new String(authDecoded); // Converte o array de bytes para String. Exemplo: user:password
 
-            var authString = new String(authDecoded); // Converte o array de bytes para String. Exemplo: user:password
-
-            String[] credentials = authString.split(":"); // Separa o usuario e senha pelo caractere ":" Exemplo: [user, password]
-            String username = credentials[0]; // Pega o usuario no indice 0 do array
-            String password = credentials[1]; // Pega a senha no indice 1 do array
+                String[] credentials = authString.split(":"); // Separa o usuario e senha pelo caractere ":" Exemplo: [user, password]
+                String username = credentials[0]; // Pega o usuario no indice 0 do array
+                String password = credentials[1]; // Pega a senha no indice 1 do array
 
 
-            // Validar usuario
+                // Validar usuario
+                var user = this.userRepository.findByUsername(username); // Busca o usuario no banco de dados pelo username
 
-            // Validar senha
+                if(user == null) {
+                    response.sendError(401, "Usuário não encontrado"); // Retorna erro 401 (Unauthorized) caso o usuario não seja encontrado
+                }
+                else {
+                    // Validar senha
+                    var passwordVerify = BCrypt.verifyer().verify(password.toCharArray(), user.getPassword());
+                    System.out.println("password em toCharArray" + password.toCharArray());
+                    System.out.println("user password" + user.getPassword());
 
-            // Segue viagem
-            filterChain.doFilter(request, response); // Passa a requisição para o próximo filtro ou servlet
+                    if(passwordVerify.verified) {
+                        // Segue viagem
+                        filterChain.doFilter(request, response); // Passa a requisição para o próximo filtro ou servlet
+                    }
+                    else {
+                        response.sendError(401);
+                    }
+                }
+            }
+            else {
+                filterChain.doFilter(request, response); // Passa a requisição para o próximo filtro ou servlet
+            }
         }
 }
