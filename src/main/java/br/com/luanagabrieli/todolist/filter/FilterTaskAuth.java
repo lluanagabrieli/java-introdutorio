@@ -45,7 +45,8 @@ public class FilterTaskAuth extends OncePerRequestFilter {
             // Pegar a rota atual
             var servletPath = request.getServletPath();
             // Verificar se essa rota vai ter verificação de user
-            if(servletPath.equals("/tasks/")) {
+            // Como agora tem uma rota tasks que inclui um id nela, é preciso alterar para startsWith() (rotas que comecam com tasks)
+            if(servletPath.startsWith("/tasks/")) {
                 // Pegar a autenticação (usuario e senha)
                 var authorization = request.getHeader("Authorization"); // Pega o header da requisição. Exemplo: Basic dXNlcjasdNzd29yZA==
 

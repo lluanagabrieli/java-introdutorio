@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,7 +66,16 @@ public class TaskController {
         return tasks;
     }
 
-    public void update() {
-        
+    @PutMapping("/{id}")
+    public TaskModel update(@RequestBody TaskModel taskModel, @PathVariable UUID id, HttpServletRequest request) {
+        // Pegar o userId
+        // Setar no taskmodel
+        // Salvar o novo taskModel
+        var userId = request.getAttribute("userId");
+        taskModel.setUserId((UUID) userId);
+        // É preciso setar o id da task que vem na rota, se não outro id é gerado automaticamente
+        taskModel.setId(id);
+
+        return this.taskRepository.save(taskModel);
     }
 }
