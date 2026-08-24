@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.luanagabrieli.todolist.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -66,16 +67,28 @@ public class TaskController {
         return tasks;
     }
 
+    // Update total de Task
+    // @PutMapping("/{id}")
+    // public TaskModel update(@RequestBody TaskModel taskModel, @PathVariable UUID id, HttpServletRequest request) {
+    //     // Pegar o userId
+    //     // Setar no taskmodel
+    //     // Salvar o novo taskModel
+    //     var userId = request.getAttribute("userId");
+        
+    //     taskModel.setUserId((UUID) userId);
+    //     // É preciso setar o id da task que vem na rota, se não outro id é gerado automaticamente
+    //     taskModel.setId(id);
+
+    //     return this.taskRepository.save(taskModel);
+    // }
+
+    // Update parcial
     @PutMapping("/{id}")
     public TaskModel update(@RequestBody TaskModel taskModel, @PathVariable UUID id, HttpServletRequest request) {
-        // Pegar o userId
-        // Setar no taskmodel
-        // Salvar o novo taskModel
-        var userId = request.getAttribute("userId");
-        taskModel.setUserId((UUID) userId);
-        // É preciso setar o id da task que vem na rota, se não outro id é gerado automaticamente
-        taskModel.setId(id);
+        var task = this.taskRepository.findById(id).orElse(null);
 
-        return this.taskRepository.save(taskModel);
+        Utils.copyNonNullPropertyNames(taskModel, task);
+
+        return this.taskRepository.save(task);
     }
 }
