@@ -42,4 +42,15 @@ public class TaskModel {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    // Se deixar somente dessa forma, retorna um bad request com uma mensagem no terminal: Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: O campo título deve conter no máximo 50 caracteres]
+
+    // Para retornar o erro de forma customizada para o usuário, foi criado uma classe na pasta errors para tratar essas excessões
+    public void setTitle(String title) throws Exception {
+        if(title.length() > 50) {
+            throw new Exception("O campo título deve conter no máximo 50 caracteres");
+        }
+
+        this.title = title;
+    }
 }

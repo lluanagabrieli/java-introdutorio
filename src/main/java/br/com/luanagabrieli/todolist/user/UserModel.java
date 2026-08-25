@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 @Entity(name="tb_users")
 public class UserModel {
-    @Column(unique = true)
+    @Column(unique = true, length = 30)
     private String username;
     private String name;
     private String password;
@@ -25,4 +25,12 @@ public class UserModel {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public void setUsername(String username) throws Exception {
+        if(username.length() > 30) {
+            throw new Exception("O campo username deve conter no máximo 30 caracteres");
+        }
+
+        this.username = username;
+    }
 }
