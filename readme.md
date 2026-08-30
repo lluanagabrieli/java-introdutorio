@@ -1,3 +1,18 @@
+## URL para testes
+
+**URL base:** `https://todolist-hlkz.onrender.com/`
+
+### Rotas disponíveis
+
+| Método   | Rota             | Descrição                |
+| -------- | -------------    | ------------------------ |
+| `POST`   | `/users/create`  | Cria um novo usuário     |
+| `POST`   | `/tasks/`        | Cria uma nova tarefa     |
+| `GET`    | `/tasks/`        | Lista todas as tarefas   |
+| `PUT`    | `/tasks/{id}`    | Atualiza uma tarefa      |
+
+---
+
 # Camadas
 
 1. Repository
